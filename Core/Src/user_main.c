@@ -14,9 +14,11 @@ void user_init()
 
 void user_while()
 {
+
 	while (1)
 	{
-
+		GPIOA->ODR ^= (1 << 5); // togle green LED
+		delay_ms(500);
 	}
 }
 

@@ -8,6 +8,9 @@
 #ifndef INC_USER_MAIN_H_
 #define INC_USER_MAIN_H_
 
+#include "stm32f401xe.h"
+#include "peripheries/timer/timer.h"
+
 void user_init();
 void user_while();
 
