@@ -15,6 +15,7 @@ Flg_Timeout_t flg_timeouts;
 /* Static variables */
 volatile uint32_t sys_ms = 0;
 volatile uint32_t timeout_ms = 0;
+
 void
 timeout_ms(unint32_t ms)
 {
