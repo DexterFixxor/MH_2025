@@ -19,7 +19,7 @@ typedef struct Flg_Timeout
 }Flg_Timeout_t;
 
 extern Flg_Timeout_t flg_timeouts;
-void timeout_ms(unint32_t ms);
+void timeout_ms_function(uint32_t ms);
 void delay_ms(uint32_t ms);
 
 #endif /* LIB_PERIPHERIES_TIMER_TIMER_H_ */

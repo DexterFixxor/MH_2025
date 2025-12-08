@@ -10,15 +10,24 @@
 
 
 /* extern */
-Flg_Timeout_t flg_timeouts;
+Flg_Timeout_t flg_timeouts = {0};
 
 /* Static variables */
 volatile uint32_t sys_ms = 0;
 volatile uint32_t timeout_ms = 0;
 
 void
-timeout_ms(unint32_t ms)
+timeout_ms_function(uint32_t ms)
 {
+	if (flg_timeouts.flg_timeout_start)
+	{
+		return; // timeout brojanje je vec otpoceto
+	}
+
+	//timeout nije otpoceo, konfigurisi ga
+	timeout_ms = ms;
+	flg_timeouts.flg_timeout_start = 1;
+	flg_timeouts.flg_timeout_end = 0;
 
 }
 
@@ -47,7 +56,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	  if (flg_timeouts.flg_timeout_start)
 	  {
-
+		  timeout_ms--;
+		  if (timeout_ms == 1)
+		  {
+			  flg_timeouts.flg_timeout_start = 0;
+			  flg_timeouts.flg_timeout_end = 1;
+		  }
 	  }
   }
 }
