@@ -21,6 +21,10 @@ typedef enum
 	BLINK1000MS,
 }FSM_States_TypeDef;
 
+	// Enable encoder interface on tim2 & tim3
+	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
+	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
+	encoders_init();
 
 void
 user_main()
