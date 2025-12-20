@@ -9,6 +9,8 @@
 #include "user_main.h"
 #include "peripheries/timer/timer.h"
 #include "peripheries/gpio/gpio_it.h"
+#include "peripheries/encoder/encoder.h"
+
 #include "tim.h"
 #include "usart.h"
 #include <string.h>
@@ -21,10 +23,7 @@ typedef enum
 	BLINK1000MS,
 }FSM_States_TypeDef;
 
-	// Enable encoder interface on tim2 & tim3
-	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
-	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
-	encoders_init();
+
 
 void
 user_main()
@@ -32,6 +31,12 @@ user_main()
 	/* Init */
 	FSM_States_TypeDef current_state = NO_BLINK;
 	uint8_t init_state = 0;
+
+
+	// Enable encoder interface on tim2 & tim3
+	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
+	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
+	encoders_init();
 
 	// Pokreni tajmer da broji
 	HAL_TIM_Base_Start_IT(&htim4);

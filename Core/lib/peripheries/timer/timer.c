@@ -40,6 +40,9 @@ HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 		sys_ms++;
 
+		if ((sys_ms % 10) == 0)
+			odom_update();
+
 		if (timeout_flags.timeout_start)
 		{
 			timeout_ms--;
