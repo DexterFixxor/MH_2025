@@ -12,6 +12,7 @@
 #include "peripheries/encoder/encoder.h"
 #include "module/bdc_motor/bdc_motor.h"
 #include "module/odom/odom.h"
+#include "module/position/position.h"
 
 #include "tim.h"
 #include "usart.h"
@@ -37,9 +38,15 @@ void user_main() {
 	HAL_TIM_Base_Start_IT(&htim4);
 
 	/* While petlja */
+	set_ref_pose(0.1, 0.1, 0.0);
 
 	while (1) {
 
+		if (current_motion_state == GOAL_REACHED)
+		{
+			current_motion_state = IDLE;
+			set_ref_pose(0.5, 0.1, 0.0);
+		}
 
 	}
 }

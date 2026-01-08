@@ -7,10 +7,11 @@
 
 #include "odom.h"
 #include "peripheries/encoder/encoder.h"
+#include "module/bdc_motor/bdc_motor.h"
+#include "peripheries/timer/timer.h"
 #include <math.h>
 
-// consts
-const float dt = 0.01;
+
 const float C_INC2RAD = 0.00076699039; 	// [rad/inc]
 const float radius_tocka = 0.075 / 2; 	// [m]
 const float rastojanje_tockova = 0.255; // [m]
@@ -32,15 +33,18 @@ void odom_update()
 	int32_t enc_r = enc1_get_delta_inc();
 	int32_t enc_l = enc2_get_delta_inc();
 
-	v_r = enc_r * C_INC2RAD * radius_tocka / dt;
-	v_l = enc_l * C_INC2RAD * radius_tocka / dt;
+	v_r = enc_r * C_INC2RAD * radius_tocka / DT;
+	v_l = enc_l * C_INC2RAD * radius_tocka / DT;
 
-	v = (v_r + v_l) / 2.0;
+	v = (v_r + v_l) * 0.5;
 	w = (v_r - v_l) / rastojanje_tockova;
 
-	x += v * dt * cosf(theta + w * dt / 2.0);
-	y += v * dt * sinf(theta + w * dt / 2.0);
-	theta += w * dt;
+	v_r_motor_measured = v + w * MOTOR_WHEEL_SEPARATION_HALF;
+	v_l_motor_measured = v - w * MOTOR_WHEEL_SEPARATION_HALF;
+
+	x += v * DT * cosf(theta + w * DT / 2.0);
+	y += v * DT * sinf(theta + w * DT / 2.0);
+	theta += w * DT;
 	theta = normalize_rad_angle(theta);
 
 }

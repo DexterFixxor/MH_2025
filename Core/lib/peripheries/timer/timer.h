@@ -10,6 +10,9 @@
 
 #include "stm32f4xx.h"
 
+#define ODOM_MS 2 // 2ms
+#define DT (ODOM_MS / 1000.0)
+
 typedef struct
 {
 	uint8_t timeout_start : 1;
