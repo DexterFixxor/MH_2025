@@ -6,6 +6,124 @@
  */
 
 #include "bdc_motor.h"
+#include "module/odom/odom.h"
+#include <math.h>
+
+const float
+v_max = 0.5, 		// m/s
+motor_acc = 1.0; 	// m/s^2 --> zeljeno ubrzanje
+
+// PID regulator
+volatile float
+motor_r_output = 0.0,
+motor_l_output = 0.0,
+motor_r_prev_error = 0.0,
+motor_l_prev_error = 0.0;
+
+const float
+Kp_r = 0.5,
+Ki_r = 0.2,
+Kp_l = 0.5,
+Ki_l = 0.2;
+
+volatile float
+vr_m = 0,
+vl_m = 0;
+
+volatile float
+vr_ref = 0.0,
+vl_ref = 0.0;
+
+volatile float
+vr_trapez = 0.0,
+vl_trapez = 0.0;
+
+
+
+
+void motor_set_ref_vel(float v, float w)
+{
+	vr_ref = v + w * 0.5 * MOTOR_WHEEL_SEPARATION;
+	vl_ref = v - w * 0.5 * MOTOR_WHEEL_SEPARATION;
+
+	vr_ref = CLIP(vr_ref, -v_max, v_max);
+	vl_ref = CLIP(vl_ref, -v_max, v_max);
+}
+
+void motor_control_loop()
+{
+	/* RIGHT */
+	// trapezni profil
+	if (fabsf(vr_trapez) < fabsf(vr_ref))
+	{
+		float acc_step = motor_acc * dt;
+		float difference = vr_ref - vr_trapez;
+
+		if (fabsf(difference) > acc_step)
+		{
+			if (difference > 0)
+				vr_trapez += acc_step;
+			else if (difference < 0)
+				vr_trapez -= acc_step;
+		}
+		else
+		{
+			vr_trapez = vr_ref;
+		}
+	}
+	else
+	{
+		vr_trapez = vr_ref;
+	}
+
+
+
+
+	/* LEFT */
+	// trapezni profil
+	if (fabsf(vl_trapez) < fabsf(vl_ref))
+	{
+		float acc_step = motor_acc * dt;
+		float difference = vl_ref - vl_trapez;
+
+		if (fabsf(difference) > acc_step)
+		{
+			if (difference > 0)
+				vl_trapez += acc_step;
+			else if (difference < 0)
+				vl_trapez -= acc_step;
+		}
+		else
+		{
+			vl_trapez = vl_ref;
+		}
+	}
+	else
+	{
+		vl_trapez = vl_ref;
+	}
+
+	// estimcija brzine pogonskog tocka [m/s]
+	vr_m = v + 0.5 * w * MOTOR_WHEEL_SEPARATION;
+	vl_m = v - 0.5 * w * MOTOR_WHEEL_SEPARATION;
+
+	float error_r = vr_trapez - vr_m;
+	float error_l = vl_trapez - vl_m;
+
+	motor_r_output += Kp_r * (error_r - motor_r_prev_error) + Ki_r * error_r;
+	motor_l_output += Kp_l * (error_l - motor_l_prev_error) + Ki_l * error_l;
+
+	motor_r_prev_error = error_r;
+	motor_l_prev_error = error_l;
+
+	// saturacija izlaza iz regulatora
+	motor_r_output = CLIP(motor_r_output, -MOTOR_VOLTAGE, MOTOR_VOLTAGE);
+	motor_l_output = CLIP(motor_l_output, -MOTOR_VOLTAGE, MOTOR_VOLTAGE);
+
+	set_motor1_voltage(motor_r_output);
+	set_motor2_voltage(motor_l_output);
+
+}
 
 void set_motor1_dir(const MotorDir_t dir)
 {

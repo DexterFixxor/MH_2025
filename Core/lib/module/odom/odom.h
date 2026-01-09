@@ -19,6 +19,8 @@ w,
 v_r,
 v_l;
 
+extern float dt;
+
 void odom_update();
 
 /*

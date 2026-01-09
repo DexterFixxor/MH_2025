@@ -37,6 +37,9 @@ void user_main() {
 	HAL_TIM_Base_Start_IT(&htim4);
 
 	/* While petlja */
+	motor_set_ref_vel(0.0, 0.0);
+	HAL_Delay(3000);
+	motor_set_ref_vel(0.0, 0.0);
 
 	while (1) {
 

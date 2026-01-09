@@ -11,9 +11,11 @@
 #include "stm32f4xx.h"
 #include "main.h"
 
-#define MOTOR_VOLTAGE 		11.3 // [V]
+#define MOTOR_VOLTAGE 		11.23 // [V]
 #define MOTOR_ARR			2099
+#define MOTOR_WHEEL_SEPARATION 0.169
 
+#define CLIP(v, v_min, v_max) (v < v_min ? v_min : (v > v_max ? v_max : v))
 
 typedef enum
 {
@@ -21,10 +23,25 @@ typedef enum
 	BACKWARD
 }MotorDir_t;
 
+extern volatile float
+vr_m,
+vl_m;
+
+extern volatile float
+vr_ref,
+vl_ref;
+
+extern volatile float
+vr_trapez,
+vl_trapez;
+
 void set_motor1_dir(const MotorDir_t dir);
 void set_motor2_dir(const MotorDir_t dir);
 
 void set_motor1_voltage(float voltage);
 void set_motor2_voltage(float voltage);
+
+void motor_set_ref_vel(float v, float w);
+void motor_control_loop();
 
 #endif /* LIB_MODULE_BDC_MOTOR_BDC_MOTOR_H_ */

@@ -9,6 +9,7 @@
 #include "tim.h"
 
 #include "module/odom/odom.h"
+#include "module/bdc_motor/bdc_motor.h"
 
 volatile uint32_t sys_ms = 0;
 volatile uint32_t timeout_ms = 0;
@@ -40,8 +41,11 @@ HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 		sys_ms++;
 
-		if ((sys_ms % 10) == 0)
+		if ((sys_ms % 1) == 0)
+		{
 			odom_update();
+			motor_control_loop();
+		}
 
 		if (timeout_flags.timeout_start)
 		{
