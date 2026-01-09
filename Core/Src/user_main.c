@@ -11,6 +11,7 @@
 #include "peripheries/gpio/gpio_it.h"
 #include "peripheries/encoder/encoder.h"
 #include "module/bdc_motor/bdc_motor.h"
+#include "module/position/position.h"
 #include "module/odom/odom.h"
 
 #include "tim.h"
@@ -37,10 +38,7 @@ void user_main() {
 	HAL_TIM_Base_Start_IT(&htim4);
 
 	/* While petlja */
-	motor_set_ref_vel(0.0, 0.0);
-	HAL_Delay(3000);
-	motor_set_ref_vel(0.0, 0.0);
-
+	robot_set_pose_ref(2.0, 0.0, 0.0);
 	while (1) {
 
 

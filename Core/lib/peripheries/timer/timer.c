@@ -42,10 +42,14 @@ HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		sys_ms++;
 
 		if ((sys_ms % 1) == 0)
-		{
 			odom_update();
+
+		if ((sys_ms % 4) == 0)
+			position_control_loop();
+
+		if ((sys_ms % 1) == 0)
 			motor_control_loop();
-		}
+
 
 		if (timeout_flags.timeout_start)
 		{

@@ -10,7 +10,7 @@
 #include <math.h>
 
 const float
-v_max = 0.5, 		// m/s
+v_max = 1.0, 		// m/s
 motor_acc = 1.0; 	// m/s^2 --> zeljeno ubrzanje
 
 // PID regulator
