@@ -15,6 +15,9 @@ const float
 eps_distance = 0.01,
 eps_phi = 0.00872664625997164788461845384244; // 0.5 deg
 
+const float
+Kp_pos = 3.0;
+
 volatile MotionState_t current_motion_state = IDLE;
 volatile float
 x_ref = 0.0,
@@ -22,17 +25,17 @@ y_ref = 0.0,
 theta_ref = 0.0;
 
 PID_t rot_regulator = {
-		.Kp = 1.0,
-		.Ki = 0.1,
-		.Kd = 0.1,
+		.Kp = 0.1,
+		.Ki = 0.01,
+		.Kd = 0.0005,
 		.out_max = M_PI,
 		.out_min = -M_PI
 };
 
 PID_t pos_regulator = {
-		.Kp = 2.0,
-		.Ki = 0.1,
-		.Kd = 0.001,
+		.Kp = 0.1,
+		.Ki = 0.01,
+		.Kd = 0.0005,
 		.out_max = 1.0,
 		.out_min = -1.0
 };
@@ -45,6 +48,9 @@ void set_position_ref(float x_des, float y_des, float theta_des)
 		y_ref = y_des;
 		theta_ref = theta_des;
 		current_motion_state = ROTATE_TO_GOAL;
+
+		PID_reset(&rot_regulator);
+		PID_reset(&pos_regulator);
 	}
 }
 
@@ -55,6 +61,7 @@ void position_control_loop()
 
 	float dx = x_ref - x;
 	float dy = y_ref - y;
+
 	float distance;
 	float error_phi;
 	float phi;
@@ -68,46 +75,51 @@ void position_control_loop()
 	switch(current_motion_state)
 	{
 	case ROTATE_TO_GOAL:
-//		PID_compute(&rot_regulator, error_phi);
-		w_des = 3.0 * error_phi;
+		PID_compute(&rot_regulator, error_phi);
+		w_des = rot_regulator.output;
 
 		if (fabsf(error_phi) < eps_phi && w == 0.0)
 		{
 			w_des = 0.0;
 			v_des = 0.0;
 			current_motion_state = TRANSLATE_TO_GOAL;
+
 		}
 
 		break;
 
 	case TRANSLATE_TO_GOAL:
 //		PID_compute(&pos_regulator, distance);
+//		v_des = pos_regulator.output;
+		v_des = 1.0 * distance;
 		if (fabsf(error_phi) > M_PI_2) // da li smo prosli cilj?
-			v_des = -distance * 2.0; // ako jesmo, idi unazad
-		else
-			v_des = distance * 2.0;
+			v_des = -v_des; // ako jesmo, idi unazad
 
-//		PID_compute(&rot_regulator, error_phi);
-		w_des = 0.2 * error_phi;
+		PID_compute(&rot_regulator, error_phi);
+		w_des = 0.2 * rot_regulator.output;
 
 		if (distance < eps_distance && v == 0.0)
-			{
-				v_des = 0.0;
-				w_des = 0.0;
-				current_motion_state = ROTATE_TO_THETA;
-			}
+		{
+			v_des = 0.0;
+			w_des = 0.0;
+			current_motion_state = ROTATE_TO_THETA;
+
+			// reset before final orientation
+			PID_reset(&rot_regulator);
+		}
 
 
 		break;
 
 	case ROTATE_TO_THETA:
-		w_des = 3.0 * error_theta;
+		PID_compute(&rot_regulator, error_theta);
+		w_des = rot_regulator.output;
 
 		if (fabsf(error_theta) < eps_phi && w == 0.0)
 		{
-					w_des = 0.0;
-					v_des = 0.0;
-					current_motion_state = GOAL_REACHED;
+			w_des = 0.0;
+			v_des = 0.0;
+			current_motion_state = GOAL_REACHED;
 		}
 		break;
 

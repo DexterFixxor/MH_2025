@@ -11,12 +11,18 @@
 #include <math.h>
 
 // consts
+/*
+ * convert inc 2 rad, enkoder ima 2048 incrementa x4 u kvadraturnom dekodiranju
+ * znaci 8192, posto pun krug ima 2 * PI radijana, jedan inkrement je
+ *
+ * 2 * PI / 8192
+ *
+ */
+const float C_INC2RAD = 0.00076699039394282061485904379474597; 	// [rad/inc]
+const float radius_tocka = 0.0775 / 2.0; 	// [m]
+const float rastojanje_tockova = 0.265; // [m]
 
-const float C_INC2RAD = 0.00076699039; 	// [rad/inc]
-const float radius_tocka = 0.075 / 2; 	// [m]
-const float rastojanje_tockova = 0.255; // [m]
-
-float dt = 0.001;
+float dt = 0.002;
 volatile float
 x = 0,
 y = 0,
@@ -45,8 +51,7 @@ void odom_update()
 
 	x += v * dt * cosf(theta + w * dt / 2.0);
 	y += v * dt * sinf(theta + w * dt / 2.0);
-	theta += w * dt;
-	theta = normalize_rad_angle(theta);
+	theta = normalize_rad_angle(theta + w * dt);
 
 }
 

@@ -22,3 +22,10 @@ void PID_compute(PID_t* pid, float error)
 	else if(pid->output < pid->out_min)
 		pid->output = pid->out_min;
 }
+
+void PID_reset(PID_t* pid)
+{
+	pid->output = 0;
+	pid->error_k_1 = 0.0;
+	pid->error_k_2 = 0.0;
+}

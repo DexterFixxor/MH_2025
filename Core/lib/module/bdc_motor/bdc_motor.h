@@ -12,9 +12,10 @@
 #include "main.h"
 
 
-#define MOTOR_VOLTAGE 				11.23 // [V]
+#define MOTOR_VOLTAGE 				11.19 // [V]
 #define MOTOR_ARR					2100
-#define MOTOR_WHEEL_SEPARATION_HALF 0.0845
+#define MOTOR_WHEEL_SEPARATION		0.158
+#define MOTOR_WHEEL_SEPARATION_HALF 0.079 // [mm]
 
 #define CLIP(v, v_max, v_min) ((v > v_max) ? v_max : ((v < v_min) ? v_min : v))
 

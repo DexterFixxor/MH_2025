@@ -8,19 +8,21 @@
 #include "bdc_motor.h"
 #include "module/pid/pid.h"
 #include "module/odom/odom.h"
+#include <math.h>
+
 
 PID_t pid_r = {
-		.Kp = 5.0,
+		.Kp = 24,
 		.Ki = 0.2,
-		.Kd = 0.05,
+		.Kd = 10,
 		.out_max = MOTOR_VOLTAGE,
 		.out_min = -MOTOR_VOLTAGE
 };
 
 PID_t pid_l =  {
-		.Kp = 6.0,
-		.Ki = 0.4,
-		.Kd = 0.05,
+		.Kp = 30,
+		.Ki = 0.2,
+		.Kd = 10,
 		.out_max = MOTOR_VOLTAGE,
 		.out_min = -MOTOR_VOLTAGE
 };
@@ -44,46 +46,30 @@ void set_motor_ref(float v_ref, float w_ref)
 
 void motor_control_loop()
 {
-	if (fabsf(vr_trapez) < fabsf(vr_ref))
+	// Desni motor
+
+	float diff_r = vr_ref - vr_trapez;
+	float step = acc_motor * dt;
+
+	if (fabsf(diff_r) > step && fabsf(vr_ref) > fabsf(vr_trapez))
 	{
-		float step = acc_motor * dt;
-		float difference = vr_ref - vr_trapez;
-		if (fabsf(difference) < step)
-		{
-			vr_trapez = vr_ref;
-		}
-		else
-		{
-			if (vr_ref > 0)
-				vr_trapez += step;
-			else if(vr_ref < 0)
-				vr_trapez -= step;
-		}
+	    vr_trapez += copysignf(step, diff_r);
 	}
 	else
 	{
-		vr_trapez = vr_ref;
+	    vr_trapez = vr_ref;
 	}
 
-	if (fabsf(vl_trapez) < fabsf(vl_ref))
+	// Levi motor
+	float diff_l = vl_ref - vl_trapez;
+
+	if (fabsf(diff_l) > step && fabsf(vl_ref) > fabsf(vl_trapez))
 	{
-		float step = acc_motor * dt;
-		float difference = vl_ref - vl_trapez;
-		if (fabsf(difference) < step)
-		{
-			vl_trapez = vl_ref;
-		}
-		else
-		{
-			if (vl_ref > 0)
-				vl_trapez += step;
-			else if(vl_ref < 0)
-				vl_trapez -= step;
-		}
+	    vl_trapez += copysignf(step, diff_l);
 	}
 	else
 	{
-		vl_trapez = vl_ref;
+	    vl_trapez = vl_ref;
 	}
 
 	float error_right = vr_trapez - vr_m;

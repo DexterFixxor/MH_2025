@@ -21,5 +21,6 @@ typedef struct
 }PID_t;
 
 void PID_compute(PID_t* pid, float error);
+void PID_reset(PID_t* pid);
 
 #endif /* LIB_MODULE_PID_PID_H_ */
