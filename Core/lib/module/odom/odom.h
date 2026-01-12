@@ -10,6 +10,7 @@
 
 #include "stm32f4xx.h"
 
+extern float dt;
 extern volatile float
 x,
 y,

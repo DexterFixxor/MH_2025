@@ -6,6 +6,95 @@
  */
 
 #include "bdc_motor.h"
+#include "module/pid/pid.h"
+#include "module/odom/odom.h"
+
+PID_t pid_r = {
+		.Kp = 5.0,
+		.Ki = 0.2,
+		.Kd = 0.05,
+		.out_max = MOTOR_VOLTAGE,
+		.out_min = -MOTOR_VOLTAGE
+};
+
+PID_t pid_l =  {
+		.Kp = 6.0,
+		.Ki = 0.4,
+		.Kd = 0.05,
+		.out_max = MOTOR_VOLTAGE,
+		.out_min = -MOTOR_VOLTAGE
+};
+
+const float v_motor_max = 1.0; // m/s
+const float acc_motor = 1.0; // m/s^2
+
+volatile float vr_m = 0, vl_m = 0;
+volatile float vr_ref = 0, vl_ref = 0;
+volatile float vr_trapez = 0, vl_trapez = 0;
+
+void set_motor_ref(float v_ref, float w_ref)
+{
+	vr_ref = v_ref + w_ref * MOTOR_WHEEL_SEPARATION_HALF;
+	vl_ref = v_ref - w_ref * MOTOR_WHEEL_SEPARATION_HALF;
+
+	vr_ref = CLIP(vr_ref, v_motor_max, -v_motor_max);
+	vl_ref = CLIP(vl_ref, v_motor_max, -v_motor_max);
+}
+
+
+void motor_control_loop()
+{
+	if (fabsf(vr_trapez) < fabsf(vr_ref))
+	{
+		float step = acc_motor * dt;
+		float difference = vr_ref - vr_trapez;
+		if (fabsf(difference) < step)
+		{
+			vr_trapez = vr_ref;
+		}
+		else
+		{
+			if (vr_ref > 0)
+				vr_trapez += step;
+			else if(vr_ref < 0)
+				vr_trapez -= step;
+		}
+	}
+	else
+	{
+		vr_trapez = vr_ref;
+	}
+
+	if (fabsf(vl_trapez) < fabsf(vl_ref))
+	{
+		float step = acc_motor * dt;
+		float difference = vl_ref - vl_trapez;
+		if (fabsf(difference) < step)
+		{
+			vl_trapez = vl_ref;
+		}
+		else
+		{
+			if (vl_ref > 0)
+				vl_trapez += step;
+			else if(vl_ref < 0)
+				vl_trapez -= step;
+		}
+	}
+	else
+	{
+		vl_trapez = vl_ref;
+	}
+
+	float error_right = vr_trapez - vr_m;
+	float error_left = vl_trapez - vl_m;
+
+	PID_compute(&pid_r, error_right);
+	PID_compute(&pid_l, error_left);
+
+	set_motor1_voltage(pid_r.output);
+	set_motor2_voltage(pid_l.output);
+}
 
 void set_motor1_dir(const MotorDir_t dir)
 {

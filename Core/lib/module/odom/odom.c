@@ -7,15 +7,16 @@
 
 #include "odom.h"
 #include "peripheries/encoder/encoder.h"
+#include "module/bdc_motor/bdc_motor.h"
 #include <math.h>
 
 // consts
-const float dt = 0.01;
+
 const float C_INC2RAD = 0.00076699039; 	// [rad/inc]
 const float radius_tocka = 0.075 / 2; 	// [m]
 const float rastojanje_tockova = 0.255; // [m]
 
-
+float dt = 0.001;
 volatile float
 x = 0,
 y = 0,
@@ -37,6 +38,10 @@ void odom_update()
 
 	v = (v_r + v_l) / 2.0;
 	w = (v_r - v_l) / rastojanje_tockova;
+
+	// estimacija brzine pogonskih motora
+	vr_m = v + w * MOTOR_WHEEL_SEPARATION_HALF;
+	vl_m = v - w * MOTOR_WHEEL_SEPARATION_HALF;
 
 	x += v * dt * cosf(theta + w * dt / 2.0);
 	y += v * dt * sinf(theta + w * dt / 2.0);

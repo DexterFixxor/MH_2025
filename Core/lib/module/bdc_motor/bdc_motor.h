@@ -11,15 +11,23 @@
 #include "stm32f4xx.h"
 #include "main.h"
 
-#define MOTOR_VOLTAGE 		11.3 // [V]
-#define MOTOR_ARR			2099
 
+#define MOTOR_VOLTAGE 				11.23 // [V]
+#define MOTOR_ARR					2100
+#define MOTOR_WHEEL_SEPARATION_HALF 0.0845
+
+#define CLIP(v, v_max, v_min) ((v > v_max) ? v_max : ((v < v_min) ? v_min : v))
 
 typedef enum
 {
 	FORWARD,
 	BACKWARD
 }MotorDir_t;
+
+extern volatile float vr_m, vl_m;
+
+void set_motor_ref(float v, float w);
+void motor_control_loop();
 
 void set_motor1_dir(const MotorDir_t dir);
 void set_motor2_dir(const MotorDir_t dir);
