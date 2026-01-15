@@ -17,6 +17,13 @@ typedef enum
 	GOAL_REACHED
 }MotionState_t;
 
+typedef struct
+{
+	float x;
+	float y;
+	float theta;
+}Pose_t;
+
 extern volatile MotionState_t current_motion_state;
 
 volatile float x_ref, y_ref, theta_ref;

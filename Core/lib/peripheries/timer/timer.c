@@ -45,7 +45,7 @@ HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		if ((sys_ms % ODOM_MS) == 0)
 			odom_update();
 
-		if ((sys_ms % (ODOM_MS * 2)) == 0)
+		if ((sys_ms % (ODOM_MS * 5)) == 0)
 			position_control_loop();
 
 		if ((sys_ms % ODOM_MS) == 0)

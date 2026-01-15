@@ -13,7 +13,7 @@
 
 #define MOTOR_VOLTAGE 		11.3 // [V]
 #define MOTOR_ARR			2099
-#define MOTOR_WHEEL_SEPARATION_HALF 0.0845
+#define MOTOR_WHEEL_SEPARATION_HALF 0.079
 
 extern volatile float
 v_r_motor_measured,

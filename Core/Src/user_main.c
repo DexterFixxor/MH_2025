@@ -13,10 +13,13 @@
 #include "module/bdc_motor/bdc_motor.h"
 #include "module/odom/odom.h"
 #include "module/position/position.h"
+#include "module/ax12/ax12.h"
 
 #include "tim.h"
 #include "usart.h"
 #include <string.h>
+#include <math.h>
+
 
 typedef enum {
 	NO_BLINK, BLINK100MS, BLINK500MS, BLINK1000MS,
@@ -38,15 +41,60 @@ void user_main() {
 	HAL_TIM_Base_Start_IT(&htim4);
 
 	/* While petlja */
-	set_ref_pose(0.1, 0.1, 0.0);
 
+	Pose_t pos1 = {
+			.x = 0.3,
+			.y = 0,
+			.theta = 0
+	};
+
+	Pose_t pos2 = {
+			.x = 0.3,
+			.y = 0.3,
+			.theta = M_PI_2
+	};
+
+	uint16_t strategy_state = 0;
+	ax_goal_position(AX12_ID, 0.0);
+	HAL_Delay(500);
 	while (1) {
 
-		if (current_motion_state == GOAL_REACHED)
+		switch(strategy_state)
 		{
-			current_motion_state = IDLE;
-			set_ref_pose(0.5, 0.1, 0.0);
-		}
+		case 0: // faza mirovanja
+			set_ref_pose(pos1.x, pos1.y, pos1.theta);
+			strategy_state = 1;
+			break;
 
+
+		case 1: // faza kretanja, cekam da robot stigne do ref tacke
+
+			if (current_motion_state == GOAL_REACHED)
+			{
+				current_motion_state = IDLE;
+				strategy_state = 2;
+			}
+			break;
+		case 2: //cekaj timeout
+			strategy_state = 3;
+			break;
+
+		case 3: // pomeri AX
+			ax_goal_position(AX12_ID, 150.0);
+			strategy_state = 4;
+			break;
+
+		case 4: //cekaj da se ax zarotira
+			// uradite sami
+			strategy_state = 5;
+			break;
+
+		case 5:
+			set_ref_pose(pos2.x, pos2.y, pos2.theta);
+			strategy_state = 6;
+			break;
+		default:
+			break;
+		}
 	}
 }

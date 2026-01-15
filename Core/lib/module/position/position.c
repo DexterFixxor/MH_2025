@@ -11,11 +11,11 @@
 #include <math.h>
 
 const float
-Kp_v = 0.5,
+Kp_v = 1.2,
 Kp_w = 1.0;
 
 const float
-eps_dist = 0.01, // 10 mm
+eps_dist = 0.05, // 50 mm
 eps_theta = 0.01745329251994329576923690768489; // rad == 1 deg
 
 
@@ -63,9 +63,9 @@ void position_control_loop()
 		if (fabsf(heading_angle) > M_PI_2)
 			v_ref = -v_ref;
 
-		w_ref = 0.05 * Kp_w * heading_error;
+		w_ref = 0.1* Kp_w * heading_error;
 
-		if (distance_error <= eps_dist && fabsf(v) < 0.05 && fabsf(w) < 0.02)
+		if (distance_error <= eps_dist && fabsf(v) < 0.05 && fabsf(w) < 0.01)
 		{
 			current_motion_state = ROTATE_TO_GOAL;
 			v_ref = 0.0;
