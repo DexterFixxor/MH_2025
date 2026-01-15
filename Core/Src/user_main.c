@@ -75,26 +75,26 @@ void user_main() {
 				strategy_state = 2;
 			}
 			break;
-		case 2: //cekaj timeout
-			strategy_state = 3;
-			break;
-
-		case 3: // pomeri AX
-			ax_goal_position(AX12_ID, 150.0);
-			strategy_state = 4;
-			break;
-
-		case 4: //cekaj da se ax zarotira
-			// uradite sami
-			strategy_state = 5;
-			break;
-
-		case 5:
-			set_ref_pose(pos2.x, pos2.y, pos2.theta);
-			strategy_state = 6;
-			break;
-		default:
-			break;
+//		case 2: //cekaj timeout
+//			strategy_state = 3;
+//			break;
+//
+//		case 3: // pomeri AX
+//			ax_goal_position(AX12_ID, 150.0);
+//			strategy_state = 4;
+//			break;
+//
+//		case 4: //cekaj da se ax zarotira
+//			// uradite sami
+//			strategy_state = 5;
+//			break;
+//
+//		case 5:
+//			set_ref_pose(pos2.x, pos2.y, pos2.theta);
+//			strategy_state = 6;
+//			break;
+//		default:
+//			break;
 		}
 	}
 }

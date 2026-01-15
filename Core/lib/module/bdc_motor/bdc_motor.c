@@ -31,14 +31,14 @@ v_l_motor_trapez = 0;
 // PI regulator right
 volatile float
 motor_output_r = 0,
-Kp_r = 0.5,
+Kp_r = 3,
 Ki_r = 0.001,
 prev_err_r = 0.0;
 
 // PI regulator left
 volatile float
 motor_output_l = 0,
-Kp_l = 0.5,
+Kp_l = 3,
 Ki_l = 0.001,
 prev_err_l = 0.0;
 
