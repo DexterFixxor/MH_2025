@@ -21,10 +21,10 @@ motor_r_prev_error = 0.0,
 motor_l_prev_error = 0.0;
 
 const float
-Kp_r = 0.5,
-Ki_r = 0.2,
-Kp_l = 0.5,
-Ki_l = 0.2;
+Kp_r = 15.0,
+Ki_r = 0.05,
+Kp_l = 15.0,
+Ki_l = 0.05;
 
 volatile float
 vr_m = 0,
@@ -37,8 +37,6 @@ vl_ref = 0.0;
 volatile float
 vr_trapez = 0.0,
 vl_trapez = 0.0;
-
-
 
 
 void motor_set_ref_vel(float v, float w)
@@ -61,9 +59,9 @@ void motor_control_loop()
 
 		if (fabsf(difference) > acc_step)
 		{
-			if (difference > 0)
+			if (vr_ref > 0)
 				vr_trapez += acc_step;
-			else if (difference < 0)
+			else if (vr_ref < 0)
 				vr_trapez -= acc_step;
 		}
 		else

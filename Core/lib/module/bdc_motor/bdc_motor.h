@@ -11,9 +11,9 @@
 #include "stm32f4xx.h"
 #include "main.h"
 
-#define MOTOR_VOLTAGE 		11.23 // [V]
+#define MOTOR_VOLTAGE 		12.0 // [V]
 #define MOTOR_ARR			2099
-#define MOTOR_WHEEL_SEPARATION 0.169
+#define MOTOR_WHEEL_SEPARATION 0.158
 
 #define CLIP(v, v_min, v_max) (v < v_min ? v_min : (v > v_max ? v_max : v))
 

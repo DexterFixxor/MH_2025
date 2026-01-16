@@ -13,6 +13,7 @@
 #include "module/bdc_motor/bdc_motor.h"
 #include "module/position/position.h"
 #include "module/odom/odom.h"
+#include "module/ax12/ax12.h"
 
 #include "tim.h"
 #include "usart.h"
@@ -38,8 +39,13 @@ void user_main() {
 	HAL_TIM_Base_Start_IT(&htim4);
 
 	/* While petlja */
-	robot_set_pose_ref(2.0, 0.0, 0.0);
+//	robot_set_pose_ref(2.0, 0.0, 0.0);
+
+
+	robot_set_pose_ref(0.3, 0.3, 0.0);
 	while (1) {
+
+
 
 
 	}

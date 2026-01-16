@@ -13,7 +13,7 @@
 /* consts */
 const float
 Kp_rot = 2.0,
-Kp_trans = 0.1;
+Kp_trans = 1.5;
 
 const float
 eps_theta = 0.01745329251994329576923690768489, // 1 deg
@@ -44,6 +44,7 @@ void position_control_loop()
 
 	float phi_error;
 	float distance;
+	float theta_error;
 
 	dx = x_ref - x;
 	dy = y_ref - y;
@@ -51,6 +52,7 @@ void position_control_loop()
 
 	phi_error = normalize_rad_angle(phi - theta);
 	distance = sqrtf(dx * dx + dy * dy);
+	theta_error = normalize_rad_angle(theta_ref - theta);
 
 	switch(current_motion_state)
 	{
@@ -84,6 +86,16 @@ void position_control_loop()
 		break;
 
 	case ROTATE_TO_THETA:
+		v_ref = 0.0;
+		w_ref = Kp_rot * theta_error;
+
+		if (fabsf(theta_error) < eps_theta && w == 0)
+		{
+			v_ref = 0.0;
+			w_ref = 0.0;
+			current_motion_state = GOAL_REACHED;
+		}
+
 
 		break;
 
