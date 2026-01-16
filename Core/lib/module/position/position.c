@@ -12,8 +12,8 @@
 
 /* consts */
 const float
-Kp_rot = 2.0,
-Kp_trans = 1.5;
+Kp_rot = 1.0,
+Kp_trans = 1.0;
 
 const float
 eps_theta = 0.01745329251994329576923690768489, // 1 deg

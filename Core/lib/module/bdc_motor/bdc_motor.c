@@ -22,9 +22,9 @@ motor_l_prev_error = 0.0;
 
 const float
 Kp_r = 15.0,
-Ki_r = 0.05,
+Ki_r = 1.0,
 Kp_l = 15.0,
-Ki_l = 0.05;
+Ki_l = 1.0;
 
 volatile float
 vr_m = 0,

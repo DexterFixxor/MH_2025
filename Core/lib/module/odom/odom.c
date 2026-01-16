@@ -15,7 +15,7 @@ const float C_INC2RAD = 0.00076699039; 	// [rad/inc]
 const float radius_tocka = 0.075 / 2; 	// [m]
 const float rastojanje_tockova = 0.255; // [m]
 
-float dt = 0.001;
+float dt = 0.002;
 volatile float
 x = 0,
 y = 0,
