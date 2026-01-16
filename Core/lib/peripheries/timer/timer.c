@@ -44,8 +44,8 @@ HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		if ((sys_ms % 2) == 0)
 			odom_update();
 
-//		if ((sys_ms % 10) == 0)
-//			position_control_loop();
+		if ((sys_ms % 10) == 0)
+			position_control_loop();
 
 		if ((sys_ms % 2) == 0)
 			motor_control_loop();

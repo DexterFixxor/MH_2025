@@ -22,6 +22,18 @@ eps_distance = 0.01;
 volatile MotionState_t current_motion_state = IDLE;
 volatile float x_ref, y_ref, theta_ref;
 
+static float
+Kp_position_interpolate(float distance, float Kp_min, float Kp_max, float d_min, float d_max)
+{
+	if (distance > d_max)
+		return Kp_min;
+	else if (distance < d_min)
+		return Kp_max;
+
+	float Kp = Kp_max - distance * (Kp_max - Kp_min) / (d_max - d_min);
+	return Kp;
+}
+
 void robot_set_pose_ref(float x, float y, float theta)
 {
 	if (current_motion_state == IDLE)
@@ -70,7 +82,7 @@ void position_control_loop()
 		break;
 
 	case TRANSLATE_TO_GOAL:
-		v_ref = Kp_trans * distance;
+		v_ref = Kp_position_interpolate(distance, 0.5, 4.0, 0.05, 2.0) * distance;
 		w_ref = 0.2 * Kp_rot * phi_error;
 
 		if (fabsf(phi_error) > M_PI_2)

@@ -40,8 +40,8 @@ void user_main() {
 	HAL_TIM_Base_Start_IT(&htim4);
 
 	/* While petlja */
-//	robot_set_pose_ref(2.0, 0.0, 0.0);
-	motor_set_ref_vel(0.5, 0.0);
+	robot_set_pose_ref(0.3, 0.0, 0.0);
+
 //	ax_goal_position(1, 0);
 //	HAL_Delay(500);
 //	uint8_t current_strategy_state = 0;
