@@ -41,37 +41,38 @@ void user_main() {
 
 	/* While petlja */
 //	robot_set_pose_ref(2.0, 0.0, 0.0);
-	ax_goal_position(1, 0);
-	HAL_Delay(500);
-	uint8_t current_strategy_state = 0;
+	motor_set_ref_vel(0.5, 0.0);
+//	ax_goal_position(1, 0);
+//	HAL_Delay(500);
+//	uint8_t current_strategy_state = 0;
 	while (1) {
 
-		switch(current_strategy_state)
-		{
-		case 0:
-			robot_set_pose_ref(0.2, 0.0, 0.0);
-			current_strategy_state = 1;
-
-			break;
-
-		case 1: // state A
-			if (current_motion_state == GOAL_REACHED)
-			{
-				current_motion_state = IDLE;
-				ax_goal_position(1, 100);
-				current_strategy_state = 2;
-			}
-			break;
-
-		case 2:
-			HAL_Delay(500);
-			current_strategy_state = 3;
-			break;
-
-		case 3:
-			robot_set_pose_ref(0.3, 0.3, M_PI_2);
-			current_strategy_state = 4;
-		}
+//		switch(current_strategy_state)
+//		{
+//		case 0:
+//			robot_set_pose_ref(0.2, 0.0, 0.0);
+//			current_strategy_state = 1;
+//
+//			break;
+//
+//		case 1: // state A
+//			if (current_motion_state == GOAL_REACHED)
+//			{
+//				current_motion_state = IDLE;
+//				ax_goal_position(1, 100);
+//				current_strategy_state = 2;
+//			}
+//			break;
+//
+//		case 2:
+//			HAL_Delay(500);
+//			current_strategy_state = 3;
+//			break;
+//
+//		case 3:
+//			robot_set_pose_ref(0.3, 0.3, M_PI_2);
+//			current_strategy_state = 4;
+//		}
 
 
 
