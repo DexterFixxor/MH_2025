@@ -47,8 +47,8 @@ void odom_update()
 	w = (v_r - v_l) / rastojanje_tockova;
 
 	// estimacija brzine pogonskih motora
-	vr_m = alpha * vr_m + (1 - alpha) * (v + w * MOTOR_WHEEL_SEPARATION_HALF);
-	vl_m = alpha * vl_m + (1 - alpha) * (v - w * MOTOR_WHEEL_SEPARATION_HALF);
+	vr_m = (1 - alpha) * vr_m + alpha * (v + w * MOTOR_WHEEL_SEPARATION_HALF);
+	vl_m = (1 - alpha) * vl_m + alpha * (v - w * MOTOR_WHEEL_SEPARATION_HALF);
 
 	x += v * dt * cosf(theta + w * dt / 2.0);
 	y += v * dt * sinf(theta + w * dt / 2.0);

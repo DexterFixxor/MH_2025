@@ -18,9 +18,10 @@ typedef struct
 	volatile float output;
 	volatile float error_k_1;
 	volatile float error_k_2;
+	volatile float prev_measure;
 }PID_t;
 
-void PID_compute(PID_t* pid, float error);
+void PID_compute(PID_t* pid, float ref, float measure);
 void PID_reset(PID_t* pid);
 
 #endif /* LIB_MODULE_PID_PID_H_ */

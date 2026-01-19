@@ -25,22 +25,6 @@ x_ref = 0.0,
 y_ref = 0.0,
 theta_ref = 0.0;
 
-PID_t rot_regulator = {
-		.Kp = 0.1,
-		.Ki = 0.01,
-		.Kd = 0.0005,
-		.out_max = M_PI,
-		.out_min = -M_PI
-};
-
-PID_t pos_regulator = {
-		.Kp = 0.1,
-		.Ki = 0.01,
-		.Kd = 0.0005,
-		.out_max = 1.0,
-		.out_min = -1.0
-};
-
 void set_position_ref(float x_des, float y_des, float theta_des)
 {
 	if (current_motion_state == IDLE)
@@ -49,9 +33,6 @@ void set_position_ref(float x_des, float y_des, float theta_des)
 		y_ref = y_des;
 		theta_ref = theta_des;
 		current_motion_state = ROTATE_TO_GOAL;
-//
-//		PID_reset(&rot_regulator);
-//		PID_reset(&pos_regulator);
 	}
 }
 
@@ -76,8 +57,6 @@ void position_control_loop()
 	switch(current_motion_state)
 	{
 	case ROTATE_TO_GOAL:
-//		PID_compute(&rot_regulator, error_phi);
-//		w_des = rot_regulator.output;
 		w_des = Kp_rot * error_phi;
 
 		if (fabsf(error_phi) < eps_phi && w == 0.0)
@@ -91,8 +70,6 @@ void position_control_loop()
 		break;
 
 	case TRANSLATE_TO_GOAL:
-//		PID_compute(&pos_regulator, distance);
-//		v_des = pos_regulator.output;
 		v_des = Kp_pos * distance;
 		if (fabsf(error_phi) > M_PI_2) // da li smo prosli cilj?
 			v_des = -v_des; // ako jesmo, idi unazad
@@ -107,8 +84,7 @@ void position_control_loop()
 			current_motion_state = ROTATE_TO_THETA;
 
 			// reset before final orientation
-			PID_reset(&rot_regulator);
-		}
+			}
 
 
 		break;

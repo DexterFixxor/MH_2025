@@ -13,16 +13,16 @@
 
 PID_t pid_r = {
 		.Kp = 15,
-		.Ki = 0.5,
-		.Kd = 0,
+		.Ki = 0.2,
+		.Kd = 10,
 		.out_max = MOTOR_VOLTAGE,
 		.out_min = -MOTOR_VOLTAGE
 };
 
 PID_t pid_l =  {
 		.Kp = 15,
-		.Ki = 0.5,
-		.Kd = 0,
+		.Ki = 0.2,
+		.Kd = 10,
 		.out_max = MOTOR_VOLTAGE,
 		.out_min = -MOTOR_VOLTAGE
 };
@@ -72,11 +72,9 @@ void motor_control_loop()
 	    vl_trapez = vl_ref;
 	}
 
-	float error_right = vr_trapez - vr_m;
-	float error_left = vl_trapez - vl_m;
 
-	PID_compute(&pid_r, error_right);
-	PID_compute(&pid_l, error_left);
+	PID_compute(&pid_r, vr_trapez, vr_m);
+	PID_compute(&pid_l, vl_trapez, vl_m);
 
 	set_motor1_voltage(pid_r.output);
 	set_motor2_voltage(pid_l.output);
