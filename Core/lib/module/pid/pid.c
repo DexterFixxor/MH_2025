@@ -11,7 +11,7 @@ void PID_compute(PID_t* pid, float error)
 {
 	pid->output += \
 			pid->Kp * (error - pid->error_k_1) + \
-			pid->Ki * error + \
+			pid->Ki * error +
 			pid->Kd * (error - 2 * pid->error_k_1 + pid->error_k_2);
 
 	pid->error_k_2 = pid->error_k_1;

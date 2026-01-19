@@ -12,7 +12,7 @@
 #include "main.h"
 
 
-#define MOTOR_VOLTAGE 				11.19 // [V]
+#define MOTOR_VOLTAGE 				12.0 // [V]
 #define MOTOR_ARR					2100
 #define MOTOR_WHEEL_SEPARATION		0.158
 #define MOTOR_WHEEL_SEPARATION_HALF 0.079 // [mm]

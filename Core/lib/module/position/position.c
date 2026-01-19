@@ -13,10 +13,11 @@
 
 const float
 eps_distance = 0.01,
-eps_phi = 0.00872664625997164788461845384244; // 0.5 deg
+eps_phi = 0.0167266462; // 1.0 deg
 
 const float
-Kp_pos = 3.0;
+Kp_pos = 3.0,
+Kp_rot = 4.0;
 
 volatile MotionState_t current_motion_state = IDLE;
 volatile float
@@ -48,9 +49,9 @@ void set_position_ref(float x_des, float y_des, float theta_des)
 		y_ref = y_des;
 		theta_ref = theta_des;
 		current_motion_state = ROTATE_TO_GOAL;
-
-		PID_reset(&rot_regulator);
-		PID_reset(&pos_regulator);
+//
+//		PID_reset(&rot_regulator);
+//		PID_reset(&pos_regulator);
 	}
 }
 
@@ -75,8 +76,9 @@ void position_control_loop()
 	switch(current_motion_state)
 	{
 	case ROTATE_TO_GOAL:
-		PID_compute(&rot_regulator, error_phi);
-		w_des = rot_regulator.output;
+//		PID_compute(&rot_regulator, error_phi);
+//		w_des = rot_regulator.output;
+		w_des = Kp_rot * error_phi;
 
 		if (fabsf(error_phi) < eps_phi && w == 0.0)
 		{
@@ -91,12 +93,12 @@ void position_control_loop()
 	case TRANSLATE_TO_GOAL:
 //		PID_compute(&pos_regulator, distance);
 //		v_des = pos_regulator.output;
-		v_des = 1.0 * distance;
+		v_des = Kp_pos * distance;
 		if (fabsf(error_phi) > M_PI_2) // da li smo prosli cilj?
 			v_des = -v_des; // ako jesmo, idi unazad
 
-		PID_compute(&rot_regulator, error_phi);
-		w_des = 0.2 * rot_regulator.output;
+		w_des = 0.1 * Kp_rot * error_phi;
+
 
 		if (distance < eps_distance && v == 0.0)
 		{
@@ -112,8 +114,7 @@ void position_control_loop()
 		break;
 
 	case ROTATE_TO_THETA:
-		PID_compute(&rot_regulator, error_theta);
-		w_des = rot_regulator.output;
+		w_des = Kp_rot * error_theta;
 
 		if (fabsf(error_theta) < eps_phi && w == 0.0)
 		{

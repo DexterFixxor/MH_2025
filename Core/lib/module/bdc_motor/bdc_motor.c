@@ -12,23 +12,23 @@
 
 
 PID_t pid_r = {
-		.Kp = 24,
-		.Ki = 0.2,
-		.Kd = 10,
+		.Kp = 15,
+		.Ki = 0.5,
+		.Kd = 0,
 		.out_max = MOTOR_VOLTAGE,
 		.out_min = -MOTOR_VOLTAGE
 };
 
 PID_t pid_l =  {
-		.Kp = 30,
-		.Ki = 0.2,
-		.Kd = 10,
+		.Kp = 15,
+		.Ki = 0.5,
+		.Kd = 0,
 		.out_max = MOTOR_VOLTAGE,
 		.out_min = -MOTOR_VOLTAGE
 };
 
 const float v_motor_max = 1.0; // m/s
-const float acc_motor = 1.0; // m/s^2
+const float acc_motor = 0.2; // m/s^2
 
 volatile float vr_m = 0, vl_m = 0;
 volatile float vr_ref = 0, vl_ref = 0;
