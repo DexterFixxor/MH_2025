@@ -23,6 +23,10 @@ const float radius_tocka = 0.0775 / 2.0; 	// [m]
 const float rastojanje_tockova = 0.265; // [m]
 
 float dt = 0.002;
+
+const float K_ENC2VEL = 0.01486043888;
+const float INV_WHEEL_BASE = 3.7735849056603773584905660377358; // 1/0.265
+
 volatile float
 x = 0,
 y = 0,
@@ -40,19 +44,22 @@ void odom_update()
 	int32_t enc_r = enc1_get_delta_inc();
 	int32_t enc_l = enc2_get_delta_inc();
 
-	v_r = enc_r * C_INC2RAD * radius_tocka / dt;
-	v_l = enc_l * C_INC2RAD * radius_tocka / dt;
+	v_r = enc_r * K_ENC2VEL;
+	v_l = enc_l * K_ENC2VEL;
 
-	v = (v_r + v_l) / 2.0;
-	w = (v_r - v_l) / rastojanje_tockova;
+	v = (v_r + v_l) * 0.5f;
+	w = (v_r - v_l) * INV_WHEEL_BASE;
 
 	// estimacija brzine pogonskih motora
-	vr_m = (1 - alpha) * vr_m + alpha * (v + w * MOTOR_WHEEL_SEPARATION_HALF);
-	vl_m = (1 - alpha) * vl_m + alpha * (v - w * MOTOR_WHEEL_SEPARATION_HALF);
+	vr_m = fmaf(alpha, (v + w * MOTOR_WHEEL_SEPARATION_HALF) - vr_m, vr_m);
+	vl_m = fmaf(alpha, (v - w * MOTOR_WHEEL_SEPARATION_HALF) - vl_m, vl_m);
 
-	x += v * dt * cosf(theta + w * dt / 2.0);
-	y += v * dt * sinf(theta + w * dt / 2.0);
-	theta = normalize_rad_angle(theta + w * dt);
+	float dtheta = w * dt;
+	float theta_mid = theta + dtheta * 0.5;
+
+	x += v * dt * cosf(theta_mid);
+	y += v * dt * sinf(theta_mid);
+	theta = normalize_rad_angle(theta + dtheta);
 
 }
 
