@@ -13,6 +13,7 @@
 #include "module/bdc_motor/bdc_motor.h"
 #include "module/odom/odom.h"
 #include "module/position/position.h"
+#include "module/ax12/ax12.h"
 
 #include "tim.h"
 #include "usart.h"
@@ -38,11 +39,14 @@ void user_main() {
 	HAL_TIM_Base_Start_IT(&htim4);
 
 	/* While petlja */
-	set_position_ref(0.3, 0.0, 0.0);
-
+	//	set_position_ref(0.3, 0.0, 0.0);
 
 	while (1) {
 
+		ax_goal_position(AX_ID, 0);
+		HAL_Delay(700);
+		ax_goal_position(AX_ID, 100);
+		HAL_Delay(700);
 
 
 	}
