@@ -63,9 +63,10 @@ void position_control_loop()
 		if (fabsf(heading_angle) > M_PI_2)
 			v_ref = -v_ref;
 
-		w_ref = 0.1* Kp_w * heading_error;
+		if (distance_error > 0.2) // 20cm
+			w_ref = Kp_w * heading_error;
 
-		if (distance_error <= eps_dist && fabsf(v) < 0.05 && fabsf(w) < 0.01)
+		if (distance_error <= eps_dist && fabsf(v) < 0.01 && fabsf(w) < 0.01)
 		{
 			current_motion_state = ROTATE_TO_GOAL;
 			v_ref = 0.0;

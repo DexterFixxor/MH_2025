@@ -8,6 +8,8 @@
 #include "bdc_motor.h"
 #include "peripheries/timer/timer.h"
 #include "gpio.h"
+#include <math.h>
+
 
 volatile float
 v_r_motor_measured = 0,
@@ -33,14 +35,14 @@ v_l_motor_trapez = 0;
 volatile float
 motor_output_r = 0,
 Kp_r = 3,
-Ki_r = 0.001,
+Ki_r = 0.01,
 prev_err_r = 0.0;
 
 // PI regulator left
 volatile float
 motor_output_l = 0,
 Kp_l = 3,
-Ki_l = 0.001,
+Ki_l = 0.01,
 prev_err_l = 0.0;
 
 void set_ref_velocity(const float v, const float w)
@@ -63,15 +65,16 @@ void set_ref_velocity(const float v, const float w)
 void bdc_motor_control_loop()
 {
 	// ako je neki od IR senzora aktivan, zaustavi se
-	if (
-			((GPIOC->IDR & (0b1 << 5)) > 0) |
-			((GPIOC->IDR & (0b1 << 6)) > 0)
-	)
-	{
-		v_r_motor_trapez = 0.95 * v_r_motor_trapez;
-		v_l_motor_trapez = 0.95 * v_l_motor_trapez;
-	}
-	else
+//	if (
+//			((GPIOC->IDR & (0b1 << 5)) > 0) |
+//			((GPIOC->IDR & (0b1 << 6)) > 0)
+//	)
+//	{
+//
+//		v_r_motor_trapez = 0;//0.90 * v_r_motor_trapez;
+//		v_l_motor_trapez = 0;//0.90 * v_l_motor_trapez;
+//	}
+	if (1)
 	{
 		/* DESNI */
 

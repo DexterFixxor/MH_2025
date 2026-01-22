@@ -13,9 +13,10 @@
 
 
 const float C_INC2RAD = 0.00076699039; 	// [rad/inc]
-const float radius_tocka = 0.075 / 2; 	// [m]
+const float radius_tocka = 0.0775 / 2; 	// [m]
 const float rastojanje_tockova = 0.255; // [m]
 
+const float beta = 1.0;
 
 volatile float
 x = 0,
@@ -39,8 +40,11 @@ void odom_update()
 	v = (v_r + v_l) * 0.5;
 	w = (v_r - v_l) / rastojanje_tockova;
 
-	v_r_motor_measured = v + w * MOTOR_WHEEL_SEPARATION_HALF;
-	v_l_motor_measured = v - w * MOTOR_WHEEL_SEPARATION_HALF;
+	v_r_motor_measured 	= (1-beta) * v_r_motor_measured +
+			beta * (v + w * MOTOR_WHEEL_SEPARATION_HALF);
+
+	v_l_motor_measured = (1-beta) * v_l_motor_measured +
+			beta * (v - w * MOTOR_WHEEL_SEPARATION_HALF);
 
 	x += v * DT * cosf(theta + w * DT / 2.0);
 	y += v * DT * sinf(theta + w * DT / 2.0);

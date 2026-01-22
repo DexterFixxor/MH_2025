@@ -11,9 +11,9 @@
 #include "stm32f4xx.h"
 #include "main.h"
 
-#define MOTOR_VOLTAGE 		11.3 // [V]
+#define MOTOR_VOLTAGE 		12.0 // [V]
 #define MOTOR_ARR			2099
-#define MOTOR_WHEEL_SEPARATION_HALF 0.079
+#define MOTOR_WHEEL_SEPARATION_HALF 0.07925
 
 extern volatile float
 v_r_motor_measured,
