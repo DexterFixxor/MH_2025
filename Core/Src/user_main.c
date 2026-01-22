@@ -62,7 +62,7 @@ void user_main() {
 		switch(strategy_state)
 		{
 		case POS_A:
-			set_position_ref(0.2, 0.0, 0.0);
+			set_position_ref(0.7, 0.0, 0.0);
 			if (current_motion_state == GOAL_REACHED)
 			{
 				strategy_state = AX_100_DEG;

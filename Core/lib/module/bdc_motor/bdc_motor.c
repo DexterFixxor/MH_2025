@@ -28,7 +28,7 @@ PID_t pid_l =  {
 };
 
 const float v_motor_max = 1.0; // m/s
-const float acc_motor = 0.2; // m/s^2
+const float acc_motor = 0.4; // m/s^2
 
 volatile float vr_m = 0, vl_m = 0;
 volatile float vr_ref = 0, vl_ref = 0;
@@ -47,29 +47,43 @@ void set_motor_ref(float v_ref, float w_ref)
 void motor_control_loop()
 {
 	// Desni motor
-
-	float diff_r = vr_ref - vr_trapez;
-	float step = acc_motor * dt;
-
-	if (fabsf(diff_r) > step && fabsf(vr_ref) > fabsf(vr_trapez))
+	uint32_t ir1 = GPIOC->IDR & (0b1 << 5);
+	uint32_t ir2 = GPIOC->IDR & (0b1 << 6);
+	if(ir1 || ir2)
 	{
-	    vr_trapez += copysignf(step, diff_r);
+		vr_trapez = vr_trapez * 0.98;
+		vl_trapez = vl_trapez * 0.98;
+		if (vr_trapez < 0.01 || vl_trapez < 0.01)
+		{
+			vr_trapez = 0;
+			vl_trapez = 0;
+		}
 	}
 	else
 	{
-	    vr_trapez = vr_ref;
-	}
+		float diff_r = vr_ref - vr_trapez;
+		float step = acc_motor * dt;
 
-	// Levi motor
-	float diff_l = vl_ref - vl_trapez;
+		if (fabsf(diff_r) > step && fabsf(vr_ref) > fabsf(vr_trapez))
+		{
+			vr_trapez += copysignf(step, diff_r);
+		}
+		else
+		{
+			vr_trapez = vr_ref;
+		}
 
-	if (fabsf(diff_l) > step && fabsf(vl_ref) > fabsf(vl_trapez))
-	{
-	    vl_trapez += copysignf(step, diff_l);
-	}
-	else
-	{
-	    vl_trapez = vl_ref;
+		// Levi motor
+		float diff_l = vl_ref - vl_trapez;
+
+		if (fabsf(diff_l) > step && fabsf(vl_ref) > fabsf(vl_trapez))
+		{
+			vl_trapez += copysignf(step, diff_l);
+		}
+		else
+		{
+			vl_trapez = vl_ref;
+		}
 	}
 
 
