@@ -7,6 +7,7 @@
 
 #include "bdc_motor.h"
 #include "peripheries/timer/timer.h"
+#include "gpio.h"
 
 volatile float
 v_r_motor_measured = 0,
@@ -21,7 +22,7 @@ v_r_max = 0.5,
 v_l_max = 0.5;
 
 const float
-motor_acc = 1.0; // m/s^2
+motor_acc = 0.25; // m/s^2
 
 volatile float
 v_r_motor_trapez = 0,
@@ -61,44 +62,56 @@ void set_ref_velocity(const float v, const float w)
 
 void bdc_motor_control_loop()
 {
-	/* DESNI */
-
-	// trapezni profil brzine
-	if (fabsf(v_r_motor_trapez) <= fabsf(v_r_motor_ref))
+	// ako je neki od IR senzora aktivan, zaustavi se
+	if (
+			((GPIOC->IDR & (0b1 << 5)) > 0) |
+			((GPIOC->IDR & (0b1 << 6)) > 0)
+	)
 	{
-		float step = motor_acc * DT;
-		if (v_r_motor_ref > 0)
-		{
-			v_r_motor_trapez += step;
-		}
-		else if (v_r_motor_ref < 0)
-		{
-			v_r_motor_trapez -= step;
-		}
+		v_r_motor_trapez = 0.95 * v_r_motor_trapez;
+		v_l_motor_trapez = 0.95 * v_l_motor_trapez;
 	}
 	else
 	{
-		v_r_motor_trapez = v_r_motor_ref;
-	}
+		/* DESNI */
 
-	/* LEVI */
+		// trapezni profil brzine
+		if (fabsf(v_r_motor_trapez) <= fabsf(v_r_motor_ref))
+		{
+			float step = motor_acc * DT;
+			if (v_r_motor_ref > 0)
+			{
+				v_r_motor_trapez += step;
+			}
+			else if (v_r_motor_ref < 0)
+			{
+				v_r_motor_trapez -= step;
+			}
+		}
+		else
+		{
+			v_r_motor_trapez = v_r_motor_ref;
+		}
 
-	// trapezni profil brzine
-	if (fabsf(v_l_motor_trapez) <= fabsf(v_l_motor_ref))
-	{
-		float step = motor_acc * DT;
-		if (v_l_motor_ref > 0)
+		/* LEVI */
+
+		// trapezni profil brzine
+		if (fabsf(v_l_motor_trapez) <= fabsf(v_l_motor_ref))
 		{
-			v_l_motor_trapez += step;
+			float step = motor_acc * DT;
+			if (v_l_motor_ref > 0)
+			{
+				v_l_motor_trapez += step;
+			}
+			else if (v_l_motor_ref < 0)
+			{
+				v_l_motor_trapez -= step;
+			}
 		}
-		else if (v_l_motor_ref < 0)
+		else
 		{
-			v_l_motor_trapez -= step;
+			v_l_motor_trapez = v_l_motor_ref;
 		}
-	}
-	else
-	{
-		v_l_motor_trapez = v_l_motor_ref;
 	}
 
 	/* PI regulacija */

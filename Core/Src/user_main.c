@@ -14,6 +14,8 @@
 #include "module/odom/odom.h"
 #include "module/position/position.h"
 #include "module/ax12/ax12.h"
+#include "module/rgb_sensor/rgb_sensor.h"
+
 
 #include "tim.h"
 #include "usart.h"
@@ -41,40 +43,45 @@ void user_main() {
 	HAL_TIM_Base_Start_IT(&htim4);
 
 	/* While petlja */
-
-	Pose_t pos1 = {
-			.x = 0.3,
-			.y = 0,
-			.theta = 0
-	};
-
-	Pose_t pos2 = {
-			.x = 0.3,
-			.y = 0.3,
-			.theta = M_PI_2
-	};
-
-	uint16_t strategy_state = 0;
-	ax_goal_position(AX12_ID, 0.0);
-	HAL_Delay(500);
+//
+//	Pose_t pos1 = {
+//			.x = 0.5,
+//			.y = 0,
+//			.theta = 0
+//	};
+//
+//	Pose_t pos2 = {
+//			.x = 0.3,
+//			.y = 0.3,
+//			.theta = M_PI_2
+//	};
+//
+//	uint16_t strategy_state = 0;
+//	ax_goal_position(AX12_ID, 0.0);
+//	HAL_Delay(500);
+	uint8_t r = 0,g = 0,b = 0,c = 0;
+	float r_norm = 0, g_norm = 0, b_norm = 0;
 	while (1) {
+		HAL_Delay(100);
 
-		switch(strategy_state)
-		{
-		case 0: // faza mirovanja
-			set_ref_pose(pos1.x, pos1.y, pos1.theta);
-			strategy_state = 1;
-			break;
-
-
-		case 1: // faza kretanja, cekam da robot stigne do ref tacke
-
-			if (current_motion_state == GOAL_REACHED)
-			{
-				current_motion_state = IDLE;
-				strategy_state = 2;
-			}
-			break;
+		enable_rgb_sensor();
+		getRGB(&r, &g, &b);
+//		switch(strategy_state)
+//		{
+//		case 0: // faza mirovanja
+//			set_ref_pose(pos1.x, pos1.y, pos1.theta);
+//			strategy_state = 1;
+//			break;
+//
+//
+//		case 1: // faza kretanja, cekam da robot stigne do ref tacke
+//
+//			if (current_motion_state == GOAL_REACHED)
+//			{
+//				current_motion_state = IDLE;
+//				strategy_state = 2;
+//			}
+//			break;
 //		case 2: //cekaj timeout
 //			strategy_state = 3;
 //			break;
@@ -95,6 +102,6 @@ void user_main() {
 //			break;
 //		default:
 //			break;
-		}
+//		}
 	}
 }
