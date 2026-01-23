@@ -12,17 +12,17 @@
 
 
 PID_t pid_r = {
-		.Kp = 15,
+		.Kp = 30,
 		.Ki = 0.2,
-		.Kd = 10,
+		.Kd = 0,
 		.out_max = MOTOR_VOLTAGE,
 		.out_min = -MOTOR_VOLTAGE
 };
 
 PID_t pid_l =  {
-		.Kp = 15,
+		.Kp = 30,
 		.Ki = 0.2,
-		.Kd = 10,
+		.Kd = 0,
 		.out_max = MOTOR_VOLTAGE,
 		.out_min = -MOTOR_VOLTAGE
 };
@@ -51,9 +51,11 @@ void motor_control_loop()
 	uint32_t ir2 = GPIOC->IDR & (0b1 << 6);
 	if(ir1 || ir2)
 	{
-		vr_trapez = vr_trapez * 0.98;
-		vl_trapez = vl_trapez * 0.98;
-		if (vr_trapez < 0.01 || vl_trapez < 0.01)
+		const float alpha = 0.985;
+		vr_trapez = vr_trapez * alpha;
+		vl_trapez = vl_trapez * alpha;
+		float step = acc_motor * dt;
+		if (fabs(vr_trapez) < step || fabsf(vl_trapez) < step)
 		{
 			vr_trapez = 0;
 			vl_trapez = 0;

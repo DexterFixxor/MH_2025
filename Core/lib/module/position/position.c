@@ -74,7 +74,8 @@ void position_control_loop()
 		if (fabsf(error_phi) > M_PI_2) // da li smo prosli cilj?
 			v_des = -v_des; // ako jesmo, idi unazad
 
-		w_des = 0.1 * Kp_rot * error_phi;
+		if (distance > 0.05) // ako smo blizu cilja, prekini kompenzaciju orijentacije
+			w_des = Kp_rot * error_phi;
 
 
 		if (distance < eps_distance && v == 0.0)
@@ -82,8 +83,6 @@ void position_control_loop()
 			v_des = 0.0;
 			w_des = 0.0;
 			current_motion_state = ROTATE_TO_THETA;
-
-			// reset before final orientation
 			}
 
 

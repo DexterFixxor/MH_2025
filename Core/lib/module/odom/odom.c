@@ -20,7 +20,7 @@
  */
 const float C_INC2RAD = 0.00076699039394282061485904379474597; 	// [rad/inc]
 const float radius_tocka = 0.0775 / 2.0; 	// [m]
-const float rastojanje_tockova = 0.265; // [m]
+const float rastojanje_tockova = 0.2605; // [m]
 
 float dt = 0.002;
 
