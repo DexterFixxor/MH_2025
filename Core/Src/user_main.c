@@ -14,6 +14,7 @@
 #include "module/position/position.h"
 #include "module/odom/odom.h"
 #include "module/ax12/ax12.h"
+#include "module/rgb_sensor/rgb_sensor.h"
 
 #include "tim.h"
 #include "usart.h"
@@ -40,13 +41,15 @@ void user_main() {
 	HAL_TIM_Base_Start_IT(&htim4);
 
 	/* While petlja */
-	robot_set_pose_ref(1.0, 0.0, 0.0);
-
+//	robot_set_pose_ref(1.0, 0.0, 0.0);
+	rgb_enable();
 //	ax_goal_position(1, 0);
 //	HAL_Delay(500);
 //	uint8_t current_strategy_state = 0;
+	rgb_enable();
 	while (1) {
 
+		read_rgbc();
 //		switch(current_strategy_state)
 //		{
 //		case 0:
