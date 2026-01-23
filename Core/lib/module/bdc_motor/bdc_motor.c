@@ -11,7 +11,7 @@
 
 const float
 v_max = 1.0, 		// m/s
-motor_acc = 1.0; 	// m/s^2 --> zeljeno ubrzanje
+motor_acc = 0.4; 	// m/s^2 --> zeljeno ubrzanje
 
 // PID regulator
 volatile float
@@ -21,10 +21,10 @@ motor_r_prev_error = 0.0,
 motor_l_prev_error = 0.0;
 
 const float
-Kp_r = 40.0,
-Ki_r = 1.0,
-Kp_l = 40.0,
-Ki_l = 1.0;
+Kp_r = 15.0,
+Ki_r = 0.2,
+Kp_l = 15.0,
+Ki_l = 0.2;
 
 volatile float
 vr_m = 0,
@@ -50,60 +50,79 @@ void motor_set_ref_vel(float v, float w)
 
 void motor_control_loop()
 {
-	/* RIGHT */
-	// trapezni profil
-	if (fabsf(vr_trapez) < fabsf(vr_ref))
+	uint32_t ir_sensor = (GPIOC->IDR & (0b1 << 5 | 0b1 << 6));
+	if (ir_sensor)
 	{
+		const float alpha = 0.99;
 		float acc_step = motor_acc * dt;
-		float difference = vr_ref - vr_trapez;
 
-		if (fabsf(difference) > acc_step)
+		vr_trapez *= alpha;
+		vl_trapez *= alpha;
+		if (fabsf(vr_trapez) < 0.01 || fabsf(vl_trapez) < 0.01)
 		{
-			if (vr_ref > 0)
-				vr_trapez += acc_step;
-			else if (vr_ref < 0)
-				vr_trapez -= acc_step;
+			vr_trapez = 0.0;
+			vl_trapez = 0.0;
+		}
+	}
+	else
+	{
+		/* RIGHT */
+		// trapezni profil
+		if (fabsf(vr_trapez) < fabsf(vr_ref))
+		{
+			float acc_step = motor_acc * dt;
+			float difference = vr_ref - vr_trapez;
+
+			if (fabsf(difference) > acc_step)
+			{
+				if (vr_ref > 0)
+					vr_trapez += acc_step;
+				else if (vr_ref < 0)
+					vr_trapez -= acc_step;
+			}
+			else
+			{
+				vr_trapez = vr_ref;
+			}
 		}
 		else
 		{
 			vr_trapez = vr_ref;
 		}
-	}
-	else
-	{
-		vr_trapez = vr_ref;
-	}
 
 
 
 
-	/* LEFT */
-	// trapezni profil
-	if (fabsf(vl_trapez) < fabsf(vl_ref))
-	{
-		float acc_step = motor_acc * dt;
-		float difference = vl_ref - vl_trapez;
-
-		if (fabsf(difference) > acc_step)
+		/* LEFT */
+		// trapezni profil
+		if (fabsf(vl_trapez) < fabsf(vl_ref))
 		{
-			if (difference > 0)
-				vl_trapez += acc_step;
-			else if (difference < 0)
-				vl_trapez -= acc_step;
+			float acc_step = motor_acc * dt;
+			float difference = vl_ref - vl_trapez;
+
+			if (fabsf(difference) > acc_step)
+			{
+				if (difference > 0)
+					vl_trapez += acc_step;
+				else if (difference < 0)
+					vl_trapez -= acc_step;
+			}
+			else
+			{
+				vl_trapez = vl_ref;
+			}
 		}
 		else
 		{
 			vl_trapez = vl_ref;
 		}
 	}
-	else
-	{
-		vl_trapez = vl_ref;
-	}
 
 	// estimcija brzine pogonskog tocka [m/s]
-	vr_m = v + 0.5 * w * MOTOR_WHEEL_SEPARATION;
-	vl_m = v - 0.5 * w * MOTOR_WHEEL_SEPARATION;
+	const float beta = 0.3;
+	// y[k] = (1-beta) * y[k-1] + beta * x[k]
+	vr_m = (1-beta) * vr_m + beta * (v + 0.5 * w * MOTOR_WHEEL_SEPARATION);
+	vl_m = (1-beta) * vl_m + beta * (v - 0.5 * w * MOTOR_WHEEL_SEPARATION);
 
 	float error_r = vr_trapez - vr_m;
 	float error_l = vl_trapez - vl_m;

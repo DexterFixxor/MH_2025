@@ -12,8 +12,8 @@
 
 /* consts */
 const float
-Kp_rot = 1.0,
-Kp_trans = 1.0;
+Kp_rot = 4.0,
+Kp_trans = 3.0;
 
 const float
 eps_theta = 0.01745329251994329576923690768489, // 1 deg
@@ -82,8 +82,11 @@ void position_control_loop()
 		break;
 
 	case TRANSLATE_TO_GOAL:
-		v_ref = Kp_position_interpolate(distance, 0.5, 4.0, 0.05, 2.0) * distance;
-		w_ref = 0.2 * Kp_rot * phi_error;
+//		v_ref = Kp_position_interpolate(distance, 0.5, 4.0, 0.05, 2.0) * distance;
+		v_ref = Kp_trans * distance;
+
+		if (distance > 0.1)
+			w_ref = Kp_rot * phi_error;
 
 		if (fabsf(phi_error) > M_PI_2)
 			v_ref = -v_ref;
