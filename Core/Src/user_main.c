@@ -14,6 +14,8 @@
 #include "module/odom/odom.h"
 #include "module/position/position.h"
 #include "module/ax12/ax12.h"
+#include "module/rgb_sensor/rgb_sensor.h"
+
 
 #include "tim.h"
 #include "usart.h"
@@ -56,21 +58,21 @@ void user_main() {
 	StrategyStates_t strategy_state = START;
 
 	strategy_state = POS_A;
-
+	rgb_sensor_enable();
 	while (1) {
-
-		switch(strategy_state)
-		{
-		case POS_A:
-			set_position_ref(0.5, 0.0, 0.0);
-			if (current_motion_state == GOAL_REACHED)
-			{
-				strategy_state = AX_100_DEG;
-				current_motion_state = IDLE;
-			}
-
-
-			break;
+		read_rgbc();
+//		switch(strategy_state)
+//		{
+//		case POS_A:
+//			set_position_ref(0.5, 0.0, 0.0);
+//			if (current_motion_state == GOAL_REACHED)
+//			{
+//				strategy_state = AX_100_DEG;
+//				current_motion_state = IDLE;
+//			}
+//
+//
+//			break;
 
 //		case AX_100_DEG:
 //			ax_goal_position(AX_ID, 100);
@@ -100,7 +102,7 @@ void user_main() {
 //		case END:
 //
 //			break;
-		}
+//		}
 
 	}
 }
