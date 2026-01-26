@@ -31,6 +31,13 @@ void read_rgbc()
 	b = read_16bit(TCS_BLUE_ADDR);
 	g = read_16bit(TCS_GREEN_ADDR);
 	c = read_16bit(TCS_CLEAR_ADDR);
+
+	if (c > 0)
+	{
+		r = 255 * ( (float)r / c);
+		b = 255 * ( (float)b / c);
+		g = 255 * ( (float)g / c);
+	}
 }
 
 uint16_t read_16bit(uint8_t reg)
