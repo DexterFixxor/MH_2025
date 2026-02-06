@@ -44,11 +44,15 @@ void user_main() {
 	// Enable UART IDLE interrupt
 	__HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
 	HAL_UART_Receive_DMA(&huart2, dma_rx_buffer, DMA_BUFFER_SIZE);
+	HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(USART2_IRQn);
 
 	// Pokreni tajmer da broji
 	HAL_TIM_Base_Start_IT(&htim4);
 	rgb_enable();
+
 	init_cmd_table();
+
 	/* While petlja */
 	while (1) {
 		parse_cmd();

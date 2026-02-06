@@ -10,7 +10,7 @@
 
 #include "stm32f4xx.h"
 
-#define DMA_BUFFER_SIZE 256
+#define DMA_BUFFER_SIZE 4096
 
 
 extern uint8_t dma_rx_buffer[DMA_BUFFER_SIZE];

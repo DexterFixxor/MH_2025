@@ -17,7 +17,7 @@ uint8_t dma_rx_buffer[DMA_BUFFER_SIZE] = {0};
 
 void uart_idle_callback()
 {
-	static uint32_t prev_pos = 0;
+	static uint32_t prev_pos;
 	uint32_t current_pos;
 	uint32_t to_copy;
 
@@ -43,20 +43,15 @@ void uart_idle_callback()
 
 		prev_pos = current_pos;
 
-		if (prev_pos == DMA_BUFFER_SIZE)
-			prev_pos = 0;
+
 
 		cmd_buffer_write += 1;
 		if (cmd_buffer_write == PARSER_CMD_BUFFER)
 			cmd_buffer_write = 0;
 	}
+
+	if (prev_pos == DMA_BUFFER_SIZE)
+		prev_pos = 0;
 }
 
-void USART2_IRQHandler()
-{
-	if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_IDLE))
-	{
-		__HAL_UART_CLEAR_FLAG(&huart2, UART_FLAG_IDLE);
-		uart_idle_callback();
-	}
-}
+

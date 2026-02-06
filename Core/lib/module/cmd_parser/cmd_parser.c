@@ -6,6 +6,7 @@
  */
 
 #include "cmd_parser.h"
+#include "usart.h"
 
 //   0     1     2    3     4             4 + N,   4 + N + 1
 // [0xFF, 0xFF, LEN, CMD, PARAM 1, ..., PARAM N, CHKSUM]
@@ -16,16 +17,44 @@ uint16_t cmd_buffer_write = 0;
 
 callback_cmd_t cmd_table[MAX_INSTRUCTION_ID] = {NULL};
 
+uint16_t toggle_cnt = 0;
 
 void init_cmd_table()
 {
 	cmd_table[TOGGLE_LED] = toggle_led;
+	cmd_table[SEND2FLOATS] = send2floats;
 }
 
 
 void toggle_led(uint8_t* msg)
 {
 	GPIOA->ODR ^= 1 << 5;
+}
+
+void send2floats(uint8_t* msg)
+{
+	const uint8_t a_offset = 4;
+	const uint8_t b_offset = 8;
+	float a = 0;
+	float b = 0;
+
+	UINT2FLOAT_t c;
+
+	c.ui[0] = msg[a_offset];
+	c.ui[1] = msg[a_offset+1];
+	c.ui[2] = msg[a_offset+2];
+	c.ui[3] = msg[a_offset+3];
+
+	a = c.f;
+
+	c.ui[0] = msg[b_offset];
+	c.ui[1] = msg[b_offset+1];
+	c.ui[2] = msg[b_offset+2];
+	c.ui[3] = msg[b_offset+3];
+
+	b = c.f;
+
+	HAL_UART_Transmit_DMA(&huart2, msg, 13);
 }
 
 void increment_read()
