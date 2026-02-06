@@ -15,11 +15,15 @@
 #include "module/odom/odom.h"
 #include "module/ax12/ax12.h"
 #include "module/rgb_sensor/rgb_sensor.h"
+#include "peripheries/uart_dma/uart_dma.h"
+#include "module/cmd_parser/cmd_parser.h"
 
 #include "tim.h"
 #include "usart.h"
 #include <string.h>
 #include <math.h>
+#include "stm32f4xx_hal_uart.h"
+
 
 typedef enum {
 	NO_BLINK, BLINK100MS, BLINK500MS, BLINK1000MS,
@@ -37,47 +41,16 @@ void user_main() {
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
 
+	// Enable UART IDLE interrupt
+	__HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
+	HAL_UART_Receive_DMA(&huart2, dma_rx_buffer, DMA_BUFFER_SIZE);
+
 	// Pokreni tajmer da broji
 	HAL_TIM_Base_Start_IT(&htim4);
-
+	rgb_enable();
+	init_cmd_table();
 	/* While petlja */
-//	robot_set_pose_ref(1.0, 0.0, 0.0);
-	rgb_enable();
-//	ax_goal_position(1, 0);
-//	HAL_Delay(500);
-//	uint8_t current_strategy_state = 0;
-	rgb_enable();
 	while (1) {
-
-		read_rgbc();
-//		switch(current_strategy_state)
-//		{
-//		case 0:
-//			robot_set_pose_ref(0.2, 0.0, 0.0);
-//			current_strategy_state = 1;
-//
-//			break;
-//
-//		case 1: // state A
-//			if (current_motion_state == GOAL_REACHED)
-//			{
-//				current_motion_state = IDLE;
-//				ax_goal_position(1, 100);
-//				current_strategy_state = 2;
-//			}
-//			break;
-//
-//		case 2:
-//			HAL_Delay(500);
-//			current_strategy_state = 3;
-//			break;
-//
-//		case 3:
-//			robot_set_pose_ref(0.3, 0.3, M_PI_2);
-//			current_strategy_state = 4;
-//		}
-
-
-
+		parse_cmd();
 	}
 }
