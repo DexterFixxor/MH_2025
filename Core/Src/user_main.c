@@ -15,28 +15,13 @@
 #include "module/position/position.h"
 #include "module/ax12/ax12.h"
 #include "module/rgb_sensor/rgb_sensor.h"
+#include "peripheries/dma_uart/dma_uart.h"
 
-
+#include "dma.h"
 #include "tim.h"
 #include "usart.h"
 #include <string.h>
 #include <math.h>
-
-
-typedef enum {
-	NO_BLINK, BLINK100MS, BLINK500MS, BLINK1000MS,
-} FSM_States_TypeDef;
-
-typedef enum
-{
-	START,
-	POS_A,
-	AX_100_DEG,
-	TIMEOUT_500,
-	POS_B,
-	AX_0_DEG,
-	END
-}StrategyStates_t;
 
 void user_main() {
 	/* Init */
@@ -53,56 +38,16 @@ void user_main() {
 	// Pokreni tajmer da broji
 	HAL_TIM_Base_Start_IT(&htim4);
 
+	//Enable prekid na idle stanje
+//	UART2->CR1 |= (1 << 4);
+	__HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
+	HAL_UART_Receive_DMA(&huart2, dma_rx_buffer, DMA_RX_BUFFER_SIZE);
+	init_cmd_table();
+
+	rgb_sensor_enable();
 	/* While petlja */
 
-	StrategyStates_t strategy_state = START;
-
-	strategy_state = POS_A;
-	rgb_sensor_enable();
 	while (1) {
-		read_rgbc();
-//		switch(strategy_state)
-//		{
-//		case POS_A:
-//			set_position_ref(0.5, 0.0, 0.0);
-//			if (current_motion_state == GOAL_REACHED)
-//			{
-//				strategy_state = AX_100_DEG;
-//				current_motion_state = IDLE;
-//			}
-//
-//
-//			break;
-
-//		case AX_100_DEG:
-//			ax_goal_position(AX_ID, 100);
-//			set_timeout_ms(500);
-//			strategy_state = TIMEOUT_500;
-//			break;
-//
-//		case TIMEOUT_500:
-//			if (timeout_flags.timeout_end)
-//				strategy_state = POS_B;
-//			break;
-//
-//		case POS_B:
-//			set_position_ref(0.2, 0.2, M_PI_2);
-//			if (current_motion_state == GOAL_REACHED)
-//			{
-//				strategy_state = AX_0_DEG;
-//				current_motion_state = IDLE;
-//			}
-//			break;
-//
-//		case AX_0_DEG:
-//			ax_goal_position(AX_ID, 0);
-//			strategy_state = END;
-//			break;
-//
-//		case END:
-//
-//			break;
-//		}
-
+		process_msg();
 	}
 }
